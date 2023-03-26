@@ -32,6 +32,8 @@ func main() {
 
     defer ec.Close()
 
+    fmt.Println("Connected to NATS! Ready to send data!")
+
     // reading cycle simulation
     for {
         now := time.Now().UnixMilli()

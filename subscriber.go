@@ -37,6 +37,8 @@ func main() {
     CheckError(err)
 
     defer ec.Close()
+
+    fmt.Println("Connected to NATS! Ready to receive data!")
     // ---------------------------------------------------
     // init db connection
     psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
