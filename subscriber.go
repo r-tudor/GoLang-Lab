@@ -70,14 +70,18 @@ func main() {
         // Insert Average into DB
         insertIntoDb := `insert into "avg_reads"("created_on", "value") values($1, $2)`
             _, e := db.Exec(insertIntoDb, time.Now().UnixMilli(), avg)
+        fmt.Println("Inserting AVERAGE READING-> ", avg)
         CheckError(e)
 
         // Insert SensorReadings into DB
         for _, readingItem := range data {
             insertIntoDb := `insert into "sensor_reads"("sensor_name", "read_on", "value") values($1, $2, $3)`
                 _, e := db.Exec(insertIntoDb, readingItem.Name, readingItem.Timestamp, readingItem.Value)
+            fmt.Println("Inserting READING -> ", readingItem)
             CheckError(e)
         }
+
+        fmt.Println("---------------------\n")
     })
 
     wg.Wait()
