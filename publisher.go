@@ -2,18 +2,18 @@ package main
 
 import (
     "encoding/json"
-    "time"
     "fmt"
     "math"
     "math/rand"
+    "time"
 
     "github.com/nats-io/nats.go"
 )
 
 type Sensor struct {
-    Name      string `json: "name"`
-    Timestamp int64  `json: "timestamp"`
-    Value     float64 `json: "value"`
+    Name      string  `json:"name"`
+    Timestamp int64   `json:"timestamp"`
+    Value     float64 `json:"value"`
 }
 
 // create feed
@@ -35,24 +35,31 @@ func main() {
 
     fmt.Println("Connected to NATS! Ready to send data!")
 
-    // reading cycle simulation
-    for {
-        now := time.Now().UnixMilli()
+    // sensor reading cycle with goroutine
+    go func() {
+        for {
+            now := time.Now().UnixMilli()
 
-        sensors := []Sensor{
-            { Name: "Sensor1", Timestamp: now, Value: roundFloat(rand.Float64()*150, 2), },
-            { Name: "Sensor2", Timestamp: now, Value: roundFloat(rand.Float64()*150, 2), },
-            { Name: "Sensor3", Timestamp: now, Value: roundFloat(rand.Float64()*150, 2), },
+            sensors := []Sensor{
+                {Name: "Sensor1", Timestamp: now, Value: roundFloat(rand.Float64()*150, 2)},
+                {Name: "Sensor2", Timestamp: now, Value: roundFloat(rand.Float64()*150, 2)},
+                {Name: "Sensor3", Timestamp: now, Value: roundFloat(rand.Float64()*150, 2)},
+            }
+
+            // prepare data for publish
+            data, err := json.Marshal(sensors)
+            CheckError(err)
+
+            // publish readings to NATS channel
+            nc.Publish("SensorReadings", data)
+
+            // sleep for the specified duration
+            time.Sleep(sleepDuration)
         }
+    }()
 
-        // prepare data for publish
-        data, err := json.Marshal(sensors)
-        CheckError(err)
-
-        // publish readings to NATS channel
-        nc.Publish("SensorReadings", data)
-        time.Sleep(time.Second)
-    }
+    // block the main Goroutine to keep the program running
+    select {}
 }
 
 // shorten the readings to 2 decimals
