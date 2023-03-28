@@ -1,4 +1,4 @@
-module example/hellp
+module golang/lab/subscriber
 
 go 1.20
 
